@@ -12,16 +12,18 @@ export function DrawerNavigator() {
       initialRouteName='Accueil'
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#6200EE',
+          backgroundColor: '#006F47',
         },
         headerTitleStyle: {
           color: '#fff',
           fontWeight: 'bold',
         },
         drawerStyle: {
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#006F47',
           width: 240,
         },
+        drawerActiveTintColor: '#FFD700', // or
+        drawerInactiveTintColor: '#fff',
       }}
     >
       <Drawer.Screen
