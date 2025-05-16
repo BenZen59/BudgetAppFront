@@ -18,6 +18,7 @@ export function DrawerNavigator() {
           color: '#fff',
           fontWeight: 'bold',
         },
+        headerTintColor: '#fff',
         drawerStyle: {
           backgroundColor: '#006F47',
           width: 240,
