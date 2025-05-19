@@ -1,10 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export function Accueil() {
   const [total, setTotal] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    'Dépenses' | 'Revenus'
+  >('Dépenses');
 
   useEffect(() => {
     axios
@@ -39,6 +48,41 @@ export function Accueil() {
           </Text>
         )}
       </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            selectedCategory === 'Dépenses' && styles.buttonSelected,
+          ]}
+          onPress={() => setSelectedCategory('Dépenses')}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              selectedCategory === 'Dépenses' && styles.buttonTextSelected,
+            ]}
+          >
+            Dépenses
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            selectedCategory === 'Revenus' && styles.buttonSelected,
+          ]}
+          onPress={() => setSelectedCategory('Revenus')}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              selectedCategory === 'Revenus' && styles.buttonTextSelected,
+            ]}
+          >
+            Revenus
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -46,7 +90,7 @@ export function Accueil() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    marginTop: 20,
     alignItems: 'center',
   },
   totalBox: {
@@ -73,5 +117,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%', // même largeur que totalBox
+    marginBottom: 20,
+    marginTop: 20,
+  },
+
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    marginHorizontal: 5,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonSelected: {
+    backgroundColor: '#006F47',
+  },
+  buttonText: {
+    color: '#000',
+    fontWeight: 'bold',
+    textDecorationLine: 'none',
+  },
+  buttonTextSelected: {
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 });
