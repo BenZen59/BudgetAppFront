@@ -9,7 +9,6 @@ const Drawer = createDrawerNavigator();
 export function DrawerNavigator() {
   return (
     <Drawer.Navigator
-      initialRouteName='Accueil'
       screenOptions={{
         headerStyle: {
           backgroundColor: '#006F47',

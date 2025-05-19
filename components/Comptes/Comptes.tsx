@@ -1,21 +1,39 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export function Comptes() {
   const [total, setTotal] = useState<number | null>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    axios
-      .get('http://localhost:3000/bankaccounts/total')
-      .then((response) => {
-        console.log('Réponse API :', response.data);
-        setTotal(response.data.total ?? 0);
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la récupération du total :', error);
-      });
+    const fetchData = async () => {
+      try {
+        const [accountsRes, totalRes] = await Promise.all([
+          axios.get('http://localhost:3000/bankaccounts'),
+          axios.get('http://localhost:3000/bankaccounts/total'),
+        ]);
+
+        setAccounts(accountsRes.data);
+        setTotal(totalRes.data.total ?? 0);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données :', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.totalBox}>
@@ -34,6 +52,26 @@ export function Comptes() {
           <Text style={styles.totalAmount}>
             {Number.isInteger(total) ? `${total} €` : `${total.toFixed(2)} €`}
           </Text>
+        )}
+      </View>
+      <View style={styles.accountList}>
+        {loading ? (
+          <ActivityIndicator size='large' />
+        ) : (
+          <FlatList
+            data={accounts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.accountCard}>
+                <Text style={styles.accountName}>{item.account_name}</Text>
+                <Text style={styles.accountAmount}>
+                  {Number.isInteger(item.amount)
+                    ? `${item.amount} €`
+                    : `${item.amount.toFixed(2)} €`}
+                </Text>
+              </View>
+            )}
+          />
         )}
       </View>
     </View>
@@ -70,5 +108,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  accountList: {
+    width: '90%',
+    marginTop: 10,
+  },
+  accountCard: {
+    backgroundColor: '#1E1F14',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+  },
+  accountName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  accountAmount: {
+    color: '#fff',
+    fontSize: 18,
+    marginTop: 5,
   },
 });
