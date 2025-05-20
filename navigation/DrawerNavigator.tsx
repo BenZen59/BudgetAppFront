@@ -1,6 +1,9 @@
 import { Accueil } from '@/components/Accueil/Accueil';
+import { Categories } from '@/components/Categories/Categories';
 import { Comptes } from '@/components/Comptes/Comptes';
 import { MaterialIcons } from '@expo/vector-icons'; // Si tu veux des icônes
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React from 'react';
 
@@ -43,6 +46,16 @@ export function DrawerNavigator() {
           headerTitle: 'Gestion des Comptes',
           drawerIcon: ({ color }) => (
             <MaterialIcons name='account-balance' size={24} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name='Catégories'
+        component={Categories}
+        options={{
+          headerTitle: 'Catégories',
+          drawerIcon: ({ color }) => (
+            <AntDesign name='bars' size={24} color={color} />
           ),
         }}
       />

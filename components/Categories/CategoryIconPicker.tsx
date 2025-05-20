@@ -1,40 +1,40 @@
+import { AntDesign } from '@expo/vector-icons';
+import React from 'react';
 import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-type Props = {
-  icons: string[];
-  selectedIcon: string;
-  selectedColor: string;
-  onSelect: (icon: string) => void;
+type IconItem = {
+  name: string;
+  color: string;
 };
 
-export function CategoryIconPicker({
-  icons,
-  selectedIcon,
-  selectedColor,
-  onSelect,
-}: Props) {
-  const renderItem = ({ item }: { item: string }) => {
-    const isSelected = item === selectedIcon;
+type Props = {
+  icons: IconItem[];
+  selectedIcon: string;
+  onSelect: (iconName: string) => void;
+};
+
+export function CategoryIconPicker({ icons, selectedIcon, onSelect }: Props) {
+  function renderItem({ item }: { item: IconItem }) {
+    const isSelected = item.name === selectedIcon;
 
     return (
       <TouchableOpacity
         style={[
           styles.iconContainer,
-          { backgroundColor: isSelected ? selectedColor : '#eee' },
+          { backgroundColor: isSelected ? item.color : '#eee' },
         ]}
-        onPress={() => onSelect(item)}
+        onPress={() => onSelect(item.name)}
       >
-        <MaterialIcons name={item} size={28} color='#fff' />
+        <AntDesign name={item.name as any} size={28} color='#fff' />
       </TouchableOpacity>
     );
-  };
+  }
 
   return (
     <FlatList
       data={icons}
       renderItem={renderItem}
-      keyExtractor={(item) => item}
+      keyExtractor={(item) => item.name}
       numColumns={4}
       contentContainerStyle={styles.list}
     />
@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
   },
