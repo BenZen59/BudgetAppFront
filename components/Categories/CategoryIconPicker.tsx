@@ -1,6 +1,6 @@
 import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type IconItem = {
   name: string;
@@ -18,14 +18,16 @@ export function CategoryIconPicker({ icons, selectedIcon, onSelect }: Props) {
     const isSelected = item.name === selectedIcon;
 
     return (
-      <TouchableOpacity
-        style={[
-          styles.iconContainer,
-          { backgroundColor: isSelected ? item.color : '#eee' },
-        ]}
-        onPress={() => onSelect(item.name)}
-      >
-        <AntDesign name={item.name as any} size={28} color='#fff' />
+      <TouchableOpacity onPress={() => onSelect(item.name)}>
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: item.color },
+            isSelected && styles.selectedBorder,
+          ]}
+        >
+          <AntDesign name={item.name as any} size={28} color='#fff' />
+        </View>
       </TouchableOpacity>
     );
   }
@@ -53,5 +55,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  selectedBorder: {
+    borderWidth: 3,
+    borderColor: '#fff',
   },
 });
