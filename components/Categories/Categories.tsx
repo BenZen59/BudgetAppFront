@@ -1,78 +1,102 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CategoryIconPicker } from './CategoryIconPicker';
-
-const expensesIcons = [
-  { name: 'creditcard', color: '#1abc9c' },
-  { name: 'book', color: '#3498db' },
-  { name: 'questioncircleo', color: '#9b59b6' },
-  { name: 'home', color: '#e67e22' },
-  { name: 'laptop', color: '#e74c3c' },
-  { name: 'shoppingcart', color: '#f1c40f' },
-  { name: 'car', color: '#2ecc71' },
-  { name: 'medicinebox', color: '#34495e' },
-];
-
-const incomeIcons = [
-  { name: 'wallet', color: '#2980b9' },
-  { name: 'smileo', color: '#8e44ad' },
-  { name: 'gift', color: '#f39c12' },
-  { name: 'bank', color: '#27ae60' },
-  { name: 'trophy', color: '#d35400' },
-  { name: 'like2', color: '#c0392b' },
-];
+import { AntDesign } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export function Categories() {
   const [selectedIcon, setSelectedIcon] = useState('creditcard');
   const [selectedCategory, setSelectedCategory] = useState<
     'Dépenses' | 'Revenus'
   >('Dépenses');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const iconsToDisplay =
-    selectedCategory === 'Dépenses' ? expensesIcons : incomeIcons;
+  const validIcons = Object.keys(AntDesign.glyphMap);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/categories');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des catégories :', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const filteredCategories = categories.filter(
+    (cat) => cat.type === selectedCategory
+  );
+
+  if (loading) return <ActivityIndicator style={{ marginTop: 40 }} />;
 
   return (
     <View style={styles.categorieContainer}>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            selectedCategory === 'Dépenses' && styles.buttonSelected,
-          ]}
-          onPress={() => setSelectedCategory('Dépenses')}
-        >
-          <Text
+        {['Dépenses', 'Revenus'].map((type) => (
+          <TouchableOpacity
+            key={type}
             style={[
-              styles.buttonText,
-              selectedCategory === 'Dépenses' && styles.buttonTextSelected,
+              styles.button,
+              selectedCategory === type && styles.buttonSelected,
             ]}
+            onPress={() => setSelectedCategory(type as 'Dépenses' | 'Revenus')}
           >
-            Dépenses
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            selectedCategory === 'Revenus' && styles.buttonSelected,
-          ]}
-          onPress={() => setSelectedCategory('Revenus')}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              selectedCategory === 'Revenus' && styles.buttonTextSelected,
-            ]}
-          >
-            Revenus
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.buttonText,
+                selectedCategory === type && styles.buttonTextSelected,
+              ]}
+            >
+              {type}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <CategoryIconPicker
-        icons={iconsToDisplay}
-        selectedIcon={selectedIcon}
-        onSelect={setSelectedIcon}
+      <FlatList
+        data={filteredCategories}
+        keyExtractor={(item) => item.id_category.toString()}
+        numColumns={4}
+        columnWrapperStyle={
+          filteredCategories.length >= 4 ? styles.row : undefined
+        }
+        contentContainerStyle={styles.grid}
+        renderItem={({ item: cat }) => {
+          const iconName =
+            typeof cat.icon?.name_icon === 'string' &&
+            validIcons.includes(cat.icon.name_icon)
+              ? cat.icon.name_icon
+              : 'questioncircleo';
+
+          return (
+            <TouchableOpacity
+              style={styles.categoryItem}
+              onPress={() => setSelectedIcon(iconName)}
+            >
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: cat.color?.hex || '#ccc' },
+                ]}
+              >
+                <AntDesign name={iconName} size={28} color='#fff' />
+              </View>
+              <Text style={styles.categoryText}>{cat.name_category}</Text>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
@@ -80,7 +104,7 @@ export function Categories() {
 
 const styles = StyleSheet.create({
   categorieContainer: {
-    marginLeft: 20,
+    marginLeft: 0,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -108,5 +132,32 @@ const styles = StyleSheet.create({
   buttonTextSelected: {
     color: '#fff',
     textDecorationLine: 'underline',
+  },
+  grid: {
+    paddingHorizontal: 10,
+    gap: 10,
+  },
+  row: {
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  categoryItem: {
+    alignItems: 'center',
+    width: '23%',
+    marginBottom: 0,
+  },
+  iconWrapper: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  categoryText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#000',
+    fontWeight: '500',
   },
 });
